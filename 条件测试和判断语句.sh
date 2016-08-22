@@ -180,6 +180,466 @@ test -u hello.sh
 9.
 逻辑操作符
 
+ 逻辑操作符可以将  多个不同的条件组合起来，从而构成一个复杂的条件表达式。
+  
+操作符    							说明
+!expression   					逻辑非(!)，条件表达式expression的值为假，则该操作符的运算结果为真。
+expression1 -a expression2  	逻辑与(and), expression1 和 expression2 都为真，整个表达式才为真
+expression1 -o expression2		逻辑非(or)，expression1 和 expression2 有一个为真，整个表达式就为真
+
+
+a=35
+test "$a" -gt 20 -a "$a" -lt 60 // 为真，表示这条命令执行成功，所以返回0
+echo $?
+
+
+
+[-e file1  -a -w file1]  #判断当前用户是否拥有某个文件的写入权限
+
+10.
+条件判断语句：
+
+条件判断语句： 使得程序根据不同的条件   来执行不同的程序分支。
+
+
+
+if语句：
+
+if expression  # expression可以是 一个条件表达式，也可以是一个shell命令。
+then 
+	statement1
+	statement2
+	statement3
+	.....
+fi
+
+
+为了使得代码更加紧凑， 某些情况下，可以将if子句和 then子句写在同一行中，此时需要在expression后面
+加一个分号。如下：
+if expression;then
+	statement1
+	statement2
+fi
+
+分号的作用：表示if子句已经结束，后面的代码是then子句
+
+
+11.
+通过条件测试  判断文件类型
+
+#! /bin/sh
+
+if [ -f /bin/bash ]
+	then echo "/bin/bash is a file"
+fi
+
+12.
+通过条件测试  判断文件是否创建成功
+
+#! /bin/sh
+echo "hello world" > ./msg.log
+if [ -f ./msg.log ]; then
+  echo "file has been created.";
+fi
+
+
+使用空命令作为判断条件
+
+#! /bin/sh
+if :; then
+	echo "always true";
+fi
+
+
+
+13.
+使用&&操作符 代替if语句。
+
+#! /bin/sh
+
+test "$(whoami)" != "root" && (echo you are using a non-privileged account; exit 1 )
+
+
+
+14.
+
+if else 语句的基本语法：
+
+if expression
+then    # expression 为真
+	statement1
+	statement2
+	....
+else  # expression 为假
+	statement3
+	statement4
+	...
+fi  #fi 关键字结束 整个if代码块
+
+
+#! /bin/sh
+
+echo "Please enter a number:"
+read num
+if [ "$num" -gt 10 ];then
+	echo "The number is greater than 10."
+else
+	echo "The number is equal to or less than 10."
+fi
+
+
+15.
+
+使用百分制，输出分数等级。
+#! /bin/sh
+
+
+echo "Please input a score:"
+read score
+if [ -z "$score" ];then # -z "$score" 判断$score是否是空串
+	echo "You enter nothing.Please input a score:"
+	read score
+else
+	if [ "$score" -lt 0 -o "$score" -gt 100 ];then
+	echo "The score should be between 0 and 100.Please enter again."
+	read score
+	else
+		if [ "$score" -ge 90 ];then
+			echo "The grade is A."
+		else
+			if [ "$score" -ge 80 ];then
+			  echo "The grade is B."
+			else
+			   if [ "$score" -ge 70 ];then
+			     echo "The grade is C."
+			   else
+				 if [ "$score" -ge 60 ];then
+			     echo "The grade is D."
+				else
+				 echo "The grade is E."
+                 fi
+			  fi
+			fi
+		fi
+	fi
+fi
+
+
+
+16.
+使用if elif语句进行多条件判断
+
+if expression1    #
+then
+	statement1
+	statement2
+	...
+elif expression2  # 
+then 
+	statement3
+	statement4
+	...
+elif expression3  #
+then
+	statement5
+	statement6
+	...
+else
+	statementn   #所有条件表达式的值都为假，
+fi  #结束标志
+
+
+使用if elif改写上面的程序
+#! /bin/sh
+echo "Please enter a score."
+read score
+
+if [ -z "$score" ];then
+	echo "You enter nothing. Please enter a score."
+	read score
+else
+	if [ "$score" -gt 100 -o "$score" -lt 0 ];then
+		echo "The score should be between 0 and 100.Please enter again."
+	else
+		if [ "$score" -ge 90 ];then
+			echo "The grade is A."
+		elif [ "$score" -ge 80 ];then
+			echo "The grade is B."
+		elif [ "$score" -ge 70 ];then
+			echo "The grade is C."
+		elif [ "$score" -ge 60 ];then
+			echo "The grade is D."
+		else
+			echo "The grade is E."
+		fi
+	fi
+fi
+
+
+17.
+exit 语句退出程序：
+
+exit 语句的基本作用是  终止shell程序的执行。
+
+exit 语句还 可以带一个可选的参数，用来指定程序退出时的状态码。
+
+exit 的基本语法：
+exit status   #status 表示退出状态。 该参数是一个整数值。取值范围：0~255.
+
+与其他的shell命令一样。shell程序的退出状态也存在系统变量$?中，
+用户 可以通过该变量 取得shell程序返回给 父进程的退出 状态码。
+
+#! /bin/sh
+
+echo hello world!
+echo $?
+aaa
+echo $?
+exit 120
+
+
+18.
+多条件判断语句case：
+
+#  variable 是一个变量
+# case语句会将 该变量的值 与 value1~valuen中的每个值
+# 进行比较，如果与某个value的值相等，则执行该value所
+# 对应的一组语句。当遇到";;"符号时，就退出case语句，
+# 执行esac语句后面的语句。如果没有任何一个值与
+# variable的值相匹配。则执行×后面的一组语句。
+
+case variable in   
+value1) 
+	statement1
+	statement2
+.....
+	statementn;;
+value2)
+	statement1
+	statement2
+.....
+	statementn;;
+value3)
+	statement1
+	statement2
+.....
+	statementn;;
+...
+valuen)
+	statement1
+	statement2
+.....
+	statementn;;
+*) #default
+	statement1
+	statement2
+.....
+	statementn;;
+esac
+
+
+19.
+利用case语句处理选项参数
+
+#! /bin/sh
+
+echo "Hit a key,then hit return."
+read keypress
+case "$keypress" in
+[[:lower:]]) #小写字母
+	echo "Lowercase letter.";;
+[[:upper:]]) #大写字母
+	echo "Uppercase letter.";;
+[0-9]) #单个数字
+	echo "Digit.";;
+*) #其他字符
+	echo "other letter.";;
+esac
+
+
+20.
+算术运算符：
+
++ 和   1+5
+- 差   1-4
+* 乘   1 * 4
+/ 商   28/5
+% 模   23%4
+** 幂  3**3==27
+
+21.
+在Linux Shell中，用户可以通过4种方式，来执行算术运算。
+这4种方式如下：
+1)使用expr外部程序。
+expr 是一个shell命令，可以计算某个表达式的值，语法如下：
+expr expression
+
+#! /bin/sh
+result=`expr 2 - 100`
+echo "$result"
+
+result=`expr 2 \* 5` #计算2*5
+echo "$result"
+
+result=`expr 24 / 3 `
+echo "$result"
+
+
+result=`expr \( 2 - 6 \) \* 12`
+echo "$result"
+
+result=`expr 2 + 100`
+echo "$result"
+
+
+
+result=`expr 2 - 4 * 9`
+echo "$result" #错误的语法
+
+result=`expr 2 - ( 100 - 7) `
+echo "$result" #错误的语法
+
+2）使用$(( ... ))
+使用这种形式来进行算术运算写法比较自由。不需要对运算符和括号进行转义处理。
+可以采用松散或者紧凑的格式来书写表达式。
+
+#! /bin/sh
+
+result=$((3+6)) #紧凑格式
+echo "$result"
+
+
+result=$(( 3 + 6 )) #松散格式
+echo "$result"
+
+
+result=$(( 3 * 6 )) #
+echo "$result"
+
+
+result=$(( 3 / 6 )) #
+echo "$result"
+
+result=$(( 3 % 6 )) #
+echo "$result"
+
+
+result=$(( (3-2) * 6 )) #
+echo "$result"
+
+ 3）$[...]  使用方括号进行算术运算
+
+#! /bin/sh
+
+result=$[4+5]
+echo "$result"
+
+result=$[(4+5) * 1]
+echo "$result"
+
+result=$[ 2 ** 3 ]
+echo "$result"
+
+4) 使用let命令   进行算术运算
+ 使用let命令可以执行一个或 多个算术表达式，其中的变量名不需要使用$符。
+如果表达式中含有空格 或者 其他特殊字符，则必须将其引用起来。
+#! /bin/sh
+n=10
+let n=n+1
+echo "$n"
+let n=n*10
+echo "$n"
+let n=n**2
+echo "$n"
+
+22.
+复合算术运算符
++=  3 += 5
+-= 
+*=
+/= 
+%=  22%=3 ==1
+
+
+
+
+22.
+位运算符：
+位运算通常出现在整数间，它针对的不是整个整数，而是其二进制表示形式中的
+某个或者某些位(bit).
+e.g.: 2 << 1 #10 左移1位,得到100，即4
+
+<<    左移   4<<2
+>>    右移    8>>2
+
+&   按位与    8 & 4
+|   按位或    8|4
+～  按位非    ~8
+^   按位异或  10 ^ 6
+
+
+复合位运算符：
+<<=  x <<= 3
+>>=  x >>= 4
+&=   x &= 8
+|=   x |= 7
+^=   x ^= 9
+
+
+
+23.
+自增/自减运算符
+
+前置自增 ++variable
+后置自增 variable++
+前置自减 --variable
+后置自减 variable--
+
+
+
+24.数字常量的进制
+在shell中，用户可以使用2种语法来表示不同的进制。
+1)增加前缀。以0开头的数字表示八进制。
+0x 开头的数字表示十六进制。
+
+2)使用“#”，2#100，表示2进制
+8#42  表示八进制
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
